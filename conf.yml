@@ -1,0 +1,41 @@
+exp:
+  exp_dir: exp/ESC50_pretrainAudioSet
+  checkpoint_dir: checkpoints
+
+classifier: # Network config
+  num_out_classes: 50
+  ff_hid: 256 # number of hidden channels
+  ff_activation: relu # activation within transformer blocks
+  bidirectional: true # bidirectional RNN in transformer blocks
+  dropout: 0
+
+feature: # Avatar config
+  wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-09/19-59-54/checkpoints/checkpoint_10_250000.pt
+#   wav2vec2_path: /mnt/scratch07/hushell/UploadAI/ckpts/wav2vec_small.pt
+  embed_dim: 512 # dimension of avatar embedding
+  freeze: False
+
+training: # Training config
+  epochs: 50
+  batch_size: 32
+  num_workers: 16
+  lr_scheduler: plateau
+  early_stop: no
+  gradient_clipping: 5
+  gpus: [0]
+
+optim: # Optim config
+  optimizer: adam
+  lr: 0.0005
+  weight_decay: !!float 1e-5
+
+data:
+#   csv_train: /mnt/scratch09/vnguyen/datasets/FSD50K//FSD50K_16k_train.csv
+#   csv_val: /mnt/scratch09/vnguyen/datasets/FSD50K//FSD50K_16k_test.csv
+  csv_train: /mnt/scratch09/vnguyen/datasets/ESC-50/ESC-50-master/ESC50_16k_train.csv
+  csv_val: /mnt/scratch09/vnguyen/datasets/ESC-50/ESC-50-master/ESC50_16k_val.csv
+  csv_file: /mnt/scratch09/vnguyen/datasets/ESC-50/ESC-50-master/ESC50_16k.csv
+#   csv_train: /mnt/scratch09/vnguyen/datasets/VCTK/VCTK_16k_train.csv
+#   csv_val: /mnt/scratch09/vnguyen/datasets/VCTK/VCTK_16k_val.csv
+  sample_rate: 16000
+  segment: 3
