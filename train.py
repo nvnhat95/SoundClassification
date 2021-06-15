@@ -22,16 +22,24 @@ def main(conf):
     with open(conf_path, "w") as outfile:
         yaml.safe_dump(conf, outfile)
 
-    dataframe = pd.read_csv(conf["data"]["csv_file"])
-    train_df, val_df = train_test_split(dataframe, test_size=0.2)
+    if conf["training"]["num_fold"] > 1:
+        dataframe = pd.read_csv(conf["data"]["csv_file"])
         
     checkpoint_dir = os.path.join(exp_dir, conf["exp"]["checkpoint_dir"])
     os.makedirs(checkpoint_dir, exist_ok=True)
         
-    for _ in range(2):
+    val_acc = []
+        
+    for _ in range(conf["training"]["num_fold"]):
         # Data loaders
-
-        train_set = ESC50(csv_file=train_df)
+        if conf["training"]["num_fold"] > 1: # re-split training set and val set
+            train_df, val_df = train_test_split(dataframe, test_size=0.2)
+            train_set = ESC50(df=train_df)
+            val_set = ESC50(df=val_df)
+        else:
+            train_set = ESC50(csv_path=conf["data"]["csv_train"])
+            val_set = ESC50(csv_path=conf["data"]["csv_val"])
+        
         train_loader = DataLoader(
                 train_set,
                 shuffle=True,
@@ -39,8 +47,7 @@ def main(conf):
                 num_workers=conf["training"]["num_workers"],
                 drop_last=False,
             )
-
-        val_set = ESC50(csv_file=val_df)
+        
         val_loader = DataLoader(
                 val_set,
                 shuffle=False,
@@ -51,9 +58,6 @@ def main(conf):
 
         # Model
         model = Wave2vec2Classifier(conf)
-
-        #     ckpt = torch.load("/mnt/scratch09/vnguyen/SoundClassification/exp/ESC50_pretrainAudioSet_checkpoint_2_50000/checkpoints_lr0.0005_128/epoch=36-val_acc=0.5714285969734192.ckpt", map_location="cpu")
-        #     model.load_state_dict(ckpt["state_dict"])
     
         # Callbacks
         callbacks = []
@@ -61,7 +65,7 @@ def main(conf):
         checkpoint = ModelCheckpoint(
             dirpath=checkpoint_dir,
             filename = '{epoch}-{val_acc}',
-            save_top_k=3,
+            save_top_k=1,
             monitor="val_acc", mode="max", verbose=True, save_last=True
         )
         callbacks.append(checkpoint)
@@ -83,17 +87,10 @@ def main(conf):
         # Training
         trainer.fit(model, train_loader, val_loader)
 
-        # Save
-        best_k = {k: v.item() for k, v in checkpoint.best_k_models.items()}
-        with open(os.path.join(exp_dir, "best_k_models.json"), "w") as f:
-            json.dump(best_k, f, indent=0)
+        # get val acc
+        val_acc.append([v.item() for k, v in checkpoint.best_k_models.items()])
             
-    
-    acc = []
-    for f in glob.glob(f"{checkpoint_dir}/epoch=*val_acc=*.ckpt"):
-        acc.append(float(os.path.basename(f)[:-5].split("=")[-1]))
-        
-    print("Average accuracy:",  np.mean(acc))
+    print("Average accuracy:",  np.mean(val_acc))
 
 
 if __name__ == "__main__":

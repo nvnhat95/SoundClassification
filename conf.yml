@@ -10,12 +10,13 @@ classifier: # Network config
   dropout: 0
 
 feature: # Avatar config
-  wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-09/19-59-54/checkpoints/checkpoint_10_250000.pt
+  wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-09/19-59-54/checkpoints/checkpoint_11_275000_copy.pt
 #   wav2vec2_path: /mnt/scratch07/hushell/UploadAI/ckpts/wav2vec_small.pt
   embed_dim: 512 # dimension of avatar embedding
   freeze: False
 
 training: # Training config
+  num_fold: 5 # set to 1 if use pre-splitted csv_train and csv_val in config["data"]
   epochs: 50
   batch_size: 32
   num_workers: 16
@@ -26,7 +27,7 @@ training: # Training config
 
 optim: # Optim config
   optimizer: adam
-  lr: 0.0005
+  lr: 0.001
   weight_decay: !!float 1e-5
 
 data:
