@@ -28,9 +28,10 @@ class Wave2vec2Classifier(pl.LightningModule):
         self.fc = nn.Linear(conf["feature"]["embed_dim"], conf["classifier"]["num_out_classes"], bias=True)
         
 #         self.fc = nn.Sequential(
-#             nn.Linear(512, 128, bias=True),
+#             nn.Linear(conf["feature"]["embed_dim"], 128, bias=True),
 #             nn.BatchNorm1d(128),
 #             nn.ReLU(),
+#             nn.Dropout(p=0.1),
 #             nn.Linear(128, conf["classifier"]["num_out_classes"], bias=True)
 #         )
         

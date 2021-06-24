@@ -1,5 +1,5 @@
 exp:
-  exp_dir: exp/ESC50_pretrainAudioSet
+  exp_dir: exp/ESC50_pretrainAudioSet_checkpoint_31_770000
   checkpoint_dir: checkpoints
 
 classifier: # Network config
@@ -10,8 +10,9 @@ classifier: # Network config
   dropout: 0
 
 feature: # Avatar config
-  wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-09/19-59-54/checkpoints/checkpoint_11_275000_copy.pt
+  #wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-09/19-59-54/checkpoints/checkpoint_16_400000.pt
 #   wav2vec2_path: /mnt/scratch07/hushell/UploadAI/ckpts/wav2vec_small.pt
+  wav2vec2_path: /mnt/scratch09/vnguyen/fairseq/examples/wav2vec/outputs/2021-06-17/16-31-28/checkpoints/checkpoint_31_770000_copy.pt
   embed_dim: 512 # dimension of avatar embedding
   freeze: False
 
@@ -23,7 +24,7 @@ training: # Training config
   lr_scheduler: plateau
   early_stop: no
   gradient_clipping: 5
-  gpus: [0]
+  gpus: [3]
 
 optim: # Optim config
   optimizer: adam
